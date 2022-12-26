@@ -22,7 +22,9 @@ class ProductController extends Controller
 
     public function getProducts(){
         //return Datatables::of(Product::query())->make(true);
-        $products = Product::where('deleted', false)->orderBy('created_at', 'asc')->get();
+        $category_id = Category::where('agent_id', Auth::user()->id)->pluck('id');
+
+        $products = Product::where('deleted', false)->whereIn('category_id', $category_id)->orderBy('created_at', 'asc')->get();
         return Datatables::of($products)
                 ->editColumn('name', function($products){
                     return $products->name;
@@ -49,7 +51,7 @@ class ProductController extends Controller
         $product->deleted = true;
         $product->deleted_at = now();
         $product->save();
-        return view('product.index')->with("successMssg", 'Artikel ' . $product->name . ' uspešno izbrisan');
+        return view('product.index')->with("successMssg", 'Podkategorija ' .$product->name . ' uspešno izbrisana');
     }
 
     public function addNewProduct(){
@@ -90,7 +92,7 @@ class ProductController extends Controller
         $product->category_id = $request->category_id;
         $product->save();
 
-        return view('product.index')->with("successMssg", 'Artikel ' . $product->name . ' uspešno dodan');
+        return view('product.index')->with("successMssg", 'Podkategorija '.$product->name . ' uspešno dodana');
     }
 
     public function editProduct(Request $request){
@@ -140,7 +142,7 @@ class ProductController extends Controller
         }
         $product->save();
 
-        return view('product.index')->with("successMssg", 'Artikel ' . $product->name . ' uspešno posodobljen');
+        return view('product.index')->with("successMssg", 'Podkategorija '.$product->name . ' uspešno posodobljena');
     }
 
     public function showProduct(Request $request){
@@ -223,36 +225,56 @@ class ProductController extends Controller
       $search_to = session()->get("rental_to");
 
       if(session()->get("rental_to") != null && session()->get("rental_from") != null){
-          $neustrezne_rezervacije = Reservation::whereDate('date_from', '<=', $search_to)
-            ->whereDate('date_to', '>=', $search_from)->get();
+            //$neustrezne_rezervacije = Reservation::whereDate('date_from', '<=', $search_to)
+            //    ->whereDate('date_to', '>=', $search_from)->get();
 
-          $productIDS = array();
-          $neustrezne_rezervacije_ids = array();
-          foreach($neustrezne_rezervacije as $rez){
-              array_push($productIDS, $rez->product_id);
-              array_push($neustrezne_rezervacije_ids, $rez->id);
-          }
+            $neustrezne_rezervacije = [];
+            $vse_rezervacije = Reservation::all();
+            foreach($vse_rezervacije as $rezervacija){
+                $rezervacija_date = date('Y-m-d', strtotime($rezervacija->date_from));
+                $search_date = date('Y-m-d', strtotime($search_from));
 
-          $ustrezne_rezervacije = Reservation::all()->whereNotIn('id', $neustrezne_rezervacije_ids)->whereNotIn('product_id', $productIDS)->pluck('product_id');
+                $rezervacija_time_from = date('H:i', strtotime($rezervacija->date_from));
+                $search_time_from = date('H:i', strtotime($search_from));
 
-          Log::info($ustrezne_rezervacije);
+                $rezervacija_time_to = date('H:i', strtotime($rezervacija->date_to));
+                $search_time_to = date('H:i', strtotime($search_to));
 
-          $tmp_rent = Rent::find($rent_id);
-          $tmp_reservation = Reservation::find(json_decode($tmp_rent->reservation_ids)[0]);
-          $tmp_product = Product::find($tmp_reservation->product_id);
+                if($rezervacija_date == $search_date && $rezervacija_time_from <= $search_time_to && $rezervacija_time_to >= $search_time_from){
+                    array_push($neustrezne_rezervacije, $rezervacija);
+                }
+            }
 
-          $allRez = Reservation::all()->pluck('product_id');
-          $noReservationYet = Product::where('deleted', false)->where("category_id", $tmp_product->category_id)->whereNotIn('id', $allRez)->get();
-          $notReservedOnDate = Product::where('deleted', false)->where("category_id", $tmp_product->category_id)->whereIn('id', $ustrezne_rezervacije)->get();
+            Log::info($neustrezne_rezervacije);  
 
-          $products = $noReservationYet->merge($notReservedOnDate);
+            $productIDS = array();
+            $neustrezne_rezervacije_ids = array();
+            foreach($neustrezne_rezervacije as $rez){
+                array_push($productIDS, $rez->product_id);
+                array_push($neustrezne_rezervacije_ids, $rez->id);
+            }
+
+            $ustrezne_rezervacije = Reservation::all()->whereNotIn('id', $neustrezne_rezervacije_ids)->whereNotIn('product_id', $productIDS)->pluck('product_id');
+
+            $tmp_rent = Rent::find($rent_id);
+            $tmp_reservation = Reservation::find(json_decode($tmp_rent->reservation_ids)[0]);
+            $tmp_product = Product::find($tmp_reservation->product_id);
+
+            $allRez = Reservation::all()->pluck('product_id');
+            $noReservationYet = Product::where('deleted', false)->where("category_id", $tmp_product->category_id)->whereNotIn('id', $allRez)->get();
+            $notReservedOnDate = Product::where('deleted', false)->where("category_id", $tmp_product->category_id)->whereIn('id', $ustrezne_rezervacije)->get();
+
+            $products = $noReservationYet->merge($notReservedOnDate);
+
+            return view('common.products_by_date', [
+                "products" => $products,
+            ]);
       }else{
-        Log::info("else");
-          $products = Product::where('deleted', false)->get();
-      }
+            $categories = Category::where('deleted', false)->get();
 
-      return view('common.products_by_date', [
-          "products" => $products,
-      ]);
+            return view('category.show', [
+                "categories" => $categories,
+            ]);
+      }
     }
 }

@@ -83,7 +83,7 @@ class ReservationController extends Controller
             $rent->rental_to = $reservation->date_to;
             $rent->rental_from = $reservation->date_from;
             $rent->save();
-            session(['rent_id' => $rent->id, 'successMssg' => 'Artikel je bil uspešno dodan']);
+            session(['rent_id' => $rent->id, 'successMssg' => 'Podkategorija je bil uspešno dodana']);
         }else{
             $rent = Rent::find(session()->get("rent_id"));
 
@@ -109,7 +109,7 @@ class ReservationController extends Controller
                 array_push($reservation_ids, $reservation->id);
                 $rent->reservation_ids = json_encode($reservation_ids);
                 $rent->save();
-                session(["successMssg" => "Artikel je bil uspešno dodan"]);
+                session(["successMssg" => "Podkategorija je bil uspešno dodan"]);
             }
         }
 

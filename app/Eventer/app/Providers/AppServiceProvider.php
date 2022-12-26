@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 //use App\Cart;
 use App\Rent;
 use DateTime;
+use Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -43,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
             */
 
             $count = 0;
-            $rent_id = session('rent_id');
+            $rent_id = session()->get("rent_id");
             if($rent_id != null){
                 $rent = Rent::find($rent_id);
                 $count = count(json_decode($rent->reservation_ids));

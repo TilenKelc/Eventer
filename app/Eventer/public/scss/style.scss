@@ -561,6 +561,11 @@ a[data-toggle="collapse"] {
 
 #content {
   width: 100%;
+
+  @include break(400px){
+	width: calc(100% - 270px);
+  }
+
   padding: 0;
   min-height: 100vh;
   transition: all 0.3s;

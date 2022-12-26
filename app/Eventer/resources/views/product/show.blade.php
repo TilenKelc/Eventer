@@ -16,22 +16,39 @@
                   <div class="upper_part">
                     <h2 class="product_name">{{ $product->name }}</h2>
 
-                    @if(session()->get("rental_to") != null && session()->get("rental_from"))
-                        @if($already_in_cart)
-                            <div class="addto">
-                                <a href="/cart" type="button" class="btn already_in_cart"><span class="fa fa-calendar-check-o"></span>Zaključi rezervacijo</a>
-                            </div>
+                    <?php
+                    $check = true;
+                    if(session()->get("rent_id")){
+                        $rent = App\Rent::find(session()->get('rent_id'));
+                        $product_ids = App\Reservation::whereIn('id', json_decode($rent->reservation_ids))->pluck('product_id');
+                        $cart_product = App\Product::find($product_ids[0]);
+                        if($cart_product->category_id != $category->id){
+                            $check = false;
+                        }
+                    }
+                    ?>
+                    @if($check)
+                        @if(session()->get("rental_to") != null && session()->get("rental_from"))
+                            @if($already_in_cart)
+                                <div class="addto">
+                                    <a href="/cart" type="button" class="btn already_in_cart"><span class="fa fa-calendar-check-o"></span>Zaključi rezervacijo</a>
+                                </div>
 
+                            @else
+                                <div class="addto">
+                                    <?php $url = url("/reservation/add/$product->id") ?>
+                                    <button type="button" class="btn put_in_cart" onclick="location.href='<?= $url ?>'"><span class="fa fa-calendar-plus-o"></span>Dodaj v košarico</button>
+                                </div>
+                            @endif
                         @else
                             <div class="addto">
-                                <?php $url = url("/reservation/add/$product->id") ?>
-                                <button type="button" class="btn put_in_cart" onclick="location.href='<?= $url ?>'"><span class="fa fa-calendar-plus-o"></span>Dodaj v košarico</button>
+                                <?php $url = url("/reservation/show/$product->id"); ?>
+                                <button type="button" class="btn pick_date" onclick="location.href='<?= $url ?>'"><span class="fa fa-calendar"></span>Izberi termin</button>
                             </div>
                         @endif
                     @else
                         <div class="addto">
-                            <?php $url = url("/reservation/show/$product->id"); ?>
-                            <button type="button" class="btn pick_date" onclick="location.href='<?= $url ?>'"><span class="fa fa-calendar"></span>Izberi termin</button>
+                            Dodaste lahko samo mize v isti restavraciji
                         </div>
                     @endif
                   </div>

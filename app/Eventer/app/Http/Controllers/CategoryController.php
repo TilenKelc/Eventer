@@ -11,6 +11,7 @@ use App\Product;
 use App\Category;
 use App\Address;
 use App\Reservation;
+use App\Rent;
 use Yajra\Datatables\Datatables;
 
 class CategoryController extends Controller
@@ -49,7 +50,7 @@ class CategoryController extends Controller
         $category->deleted = true;
         $category->deleted_at = now();
         $category->save();
-        return view('category.index')->with("successMssg", 'Kategorija ' . $category->name . ' uspešno izbrisana');
+        return view('category.index')->with("successMssg", 'Restavracija ' . $category->name . ' uspešno izbrisana');
     }
 
     public function saveUpdatedCategory(Request $request){
@@ -104,7 +105,7 @@ class CategoryController extends Controller
         $category->address_id = $address_id;
         $category->save();
 
-        return view('category.index')->with("successMssg", 'Kategorija ' . $category->name . ' uspešno posodobljena');
+        return view('category.index')->with("successMssg", 'Restavracija ' . $category->name . ' uspešno posodobljena');
     }
 
     public function addNewCategory(){
@@ -169,7 +170,7 @@ class CategoryController extends Controller
         $category->address_id = $address_id;
         $category->save();
 
-        return view('category.index')->with("successMssg", 'Kategorija ' . $category->name . ' uspešno dodana');
+        return view('category.index')->with("successMssg", 'Restavracija ' . $category->name . ' uspešno dodana');
     }
 
     public function showCategoryProducts(Request $request){
@@ -201,9 +202,19 @@ class CategoryController extends Controller
             $products = Product::where('category_id', $category_id)->where('deleted', false)->get();
         }
 
+        /*$already_in_cart = [];
+        if(session()->get('rent_id') != null){
+            $rent = Rent::find(session()->get('rent_id'));
+            $product_ids = Reservation::whereIn('id', json_decode($rent->reservation_ids))->pluck('product_id');
+            foreach($product_ids as $id){
+                array_push($already_in_cart, $id);
+            }
+        }*/
+
         return view('category.products', [
             "category_id" => $category_id,
             "products" => $products,
+            //"already_in_cart" => $already_in_cart
         ]);
     }
 

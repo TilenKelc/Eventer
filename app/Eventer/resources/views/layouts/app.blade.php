@@ -12,6 +12,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/bs.css') }}" >
     <link rel="stylesheet" href="{{ asset('css/style.css') }}" >
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 
@@ -62,25 +63,22 @@
             <li>
               <a href="{{ url('/rent/show/all') }}"><span class="fa fa-archive"></span> {{ __('Rezervacije') }}</a>
             </li>
-            <li>
-              <a href="{{ url('/user/show/all') }}"><span class="fa fa-users"></span>{{ __('Stranke') }}</a>
-            </li>
+            @if(Auth::user()->isAdmin())
+              <li>
+                <a href="{{ url('/user/show/all') }}"><span class="fa fa-users"></span>{{ __('Stranke') }}</a>
+              </li>
+            @endif
           @endif
 
           @if(Auth::check() && Auth::user()->isAdmin())
             <li>
               <a href="{{ url('/agent/index') }}"><span class="fa fa-users"></span>{{ __('Agenti') }}</a>
             </li>
-            <li>
-              <a href="{{ url('/company/edit') }}"><span class="fa fa-building"></span> {{ __('Podatki o podjetju') }}</a>
-            </li>
           @endif
 
           @if(Auth::check())
             <li>
-              @if(Auth::user()->isStaff())
-                <a href="{{ url('/myrents') }}"><span class="fa fa-history"></span> {{ __('Interne rezervacije') }}</a>
-              @else
+              @if(!Auth::user()->isStaff())
                 <a href="{{ url('/myrents') }}"><span class="fa fa-history"></span> {{ __('Moje rezervacije') }}</a>
               @endif
             </li>
@@ -285,17 +283,6 @@
           </div>
         @endif
         <main class="py-4">
-
-            @if($current == 'rent' && Auth::user()->isStaff())
-
-            <div class="bljiznice text-center" style="margin-bottom: 24px;">
-            <a class="" style="padding: 10px; background: lightcoral;  color: #fff; border: 1px solid #a20606; margin-right: 10px; border-radius: 4px;" href="{{ url('/rent/show/today_out') }}"><span class="fa fa-exclamation-circle"></span> {{ __('Današnji prevzemi') }}</a>
-            <a class="" style="padding: 10px; background: blanchedalmond; border: 1px solid #a20606; margin-right: 10px; border-radius: 4px;" href="{{ url('/rent/show/today_in') }}"><span class="fa fa-share-square"></span> {{ __('Današnja vračila') }}</a>
-            <a class="" style="padding: 10px; background: cornsilk; border: 1px solid #a20606; margin-right: 10px; border-radius: 4px;" href="{{ url('/rent/show/week_out') }}"><span class="fa fa-calendar"></span> {{ __('Prevzemi 7 dni') }}</a>
-            </div>
-            @endif
-
-
             @yield('content')
         </main>
 
@@ -313,14 +300,6 @@
 
     <script>
       $(document).ready(function () {
-        $(document).on('click', ".demo", function () {
-          Swal.fire(
-            'Preklicano',
-            'Ta funkcionalnost na demo verziji ne deluje',
-            'info'
-          )
-        });
-
         $('#reservation_reset').on('click', function(){
           Swal.fire({
             title: 'Ali ste prepričani, da želite ponastaviti datum?',

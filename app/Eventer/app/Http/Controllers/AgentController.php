@@ -12,6 +12,7 @@ use App\Product;
 use App\Rent;
 use App\Reservation;
 use App\Address;
+use App\Category;
 use Yajra\Datatables\Datatables;
 use Log;
 
@@ -161,21 +162,67 @@ class AgentController extends Controller
         if($request->status == 'all'){
             $rent = Rent::orderBy('created_at', 'asc')->get();
 
-        } elseif($request->status == 'today_out'){
-          // $rent = Rent::whereRaw('Date(rental_from) = CURDATE()')->where('status','successfully_paid')->get();
-            $rent = Rent::whereRaw('Date(rental_from) = CURDATE()')->orWhereRaw('Date(rental_from) = CURDATE() + 1')->where('status','successfully_paid')->get();
+            if(Auth::user()->isAgent()){
+                
+                $rent_array = [];
+                foreach($rent as $tmp_rent){
+        
+                    $category = null;
+                    $equipment_ids = json_decode($tmp_rent->equipment_ids);
+                    if($equipment_ids == null){
+                        $reservation_ids = json_decode($tmp_rent->reservation_ids);
+                        $reservation = Reservation::find($reservation_ids[0]);
 
-        } elseif($request->status == 'week_out'){
-          $from = date("Y-m-d");
-          $to = date("Y-m-d", strtotime("+1 week"));;
-          $rent = Rent::whereBetween('rental_from', [$from, $to])->where('status','successfully_paid')->get();
+                        $product = Product::find($reservation->product_id);
+                        $category = Category::find($product->category_id);
 
-        } elseif($request->status == 'today_in'){
-          $rent = Rent::whereRaw('Date(rental_to) = CURDATE() - 1')->orWhereRaw('Date(rental_to) = CURDATE()')->orWhereRaw('Date(rental_to) = CURDATE() + 1')->where('status','in_progress')->get();
+                        if($category->agent_id == Auth::id()){
+                            array_push($rent_array, $tmp_rent);
+                        }
+                    }else{
+                        $product = Product::find($equipment_ids[0]);
+                        $category = Category::find($product->category_id);
 
+                        if($category->agent_id == Auth::id()){
+                            array_push($rent_array, $tmp_rent);
+                        }
+                    }
+                }
+                $rent = $rent_array;
+            }
         }else{
             $rent = Rent::where('status', $request->status)->orderBy('created_at', 'asc')->get();
+            
+            if(Auth::user()->isAgent()){
+
+                $rent_array = [];
+                foreach($rent as $tmp_rent){
+        
+                    $category = null;
+                    $equipment_ids = json_decode($tmp_rent->equipment_ids);
+                    if($equipment_ids == null){
+                        $reservation_ids = json_decode($tmp_rent->reservation_ids);
+                        $reservation = Reservation::find($reservation_ids[0]);
+
+                        $product = Product::find($reservation->product_id);
+                        $category = Category::find($product->category_id);
+
+                        if($category->agent_id == Auth::id()){
+                            array_push($rent_array, $tmp_rent);
+                        }
+                    }else{
+                        $product = Product::find($equipment_ids[0]);
+                        $category = Category::find($product->category_id);
+
+                        if($category->agent_id == Auth::id()){
+                            array_push($rent_array, $tmp_rent);
+                        }
+                    }
+                }
+                $rent = $rent_array;
+            }
         }
+
         return Datatables::of($rent)
                 ->editColumn('name', function($rent){
                     $customer = User::find($rent->customer_id);
@@ -194,6 +241,21 @@ class AgentController extends Controller
                         return 'V čakanju';
                     }
                 })
+                ->editColumn('category_id', function($rent){
+                    $category = "";
+                    $equipment_ids = json_decode($rent->equipment_ids);
+                    if($equipment_ids == null){
+                        $reservation_ids = json_decode($rent->reservation_ids);
+                        $reservation = Reservation::find($reservation_ids[0]);
+    
+                        $product = Product::find($reservation->product_id);
+                        $category = Category::find($product->category_id)->name;
+                    }else{
+                        $product = Product::find($equipment_ids[0]);
+                        $category = Category::find($product->category_id)->name;
+                    }
+                    return $category;
+                })
                 ->editColumn('email', function($rent){
                     $customer = User::find($rent->customer_id);
                     return $customer->email;
@@ -205,19 +267,12 @@ class AgentController extends Controller
                     $list = '<ul class="list">';
                     $equipment_ids = json_decode($rent->equipment_ids);
                     if($equipment_ids == null){
-
-                      if($reservation_ids = json_decode($rent->reservation_ids)){
+                        $reservation_ids = json_decode($rent->reservation_ids);
                         foreach($reservation_ids as $id){
                             $reservation = Reservation::find($id);
                             $product = Product::find($reservation->product_id);
                             $list = $list . '<li>' . $product->name .'</li>';
                         }
-                      } else {
-                        $list = $list . '/';
-                      }
-
-
-
                     }else{
                         foreach($equipment_ids as $id){
                             $product = Product::find($id);
@@ -228,13 +283,7 @@ class AgentController extends Controller
                     return $list;
                 })
                 ->editColumn('date_to', function($rent){
-                    return date('d.m.Y', strtotime($rent->rental_to));
-                })
-                ->editColumn('total_price', function($rent){
-                    if($rent->total_price == null){
-                        return '/';
-                    }
-                    return $rent->total_price . ' EUR';
+                    return date('H:00', strtotime($rent->rental_from)) . ' - ' . date('H:00', strtotime($rent->rental_to));
                 })
                 ->editColumn('ready_for_take_over', function($rent){
                     if($rent->ready_for_take_over == true){
@@ -250,10 +299,7 @@ class AgentController extends Controller
                     return date('d.m.Y h:i', strtotime($rent->canceled_timestamp));
                 })
                 ->addColumn('edit', function ($rent) {
-                    if(Auth::user()->isAdmin()){
-                        return '<a href="/rent/edit/' .$rent->id. '">Posodobi</a>';
-                    }
-                    return '<a href="javascript:void(0)" class="demo">Posodobi</a>';
+                    return '<a href="/rent/edit/' .$rent->id. '">Posodobi</a>';
                 })
                 ->rawColumns(['edit', 'delete', 'products'])
                 ->make(true);

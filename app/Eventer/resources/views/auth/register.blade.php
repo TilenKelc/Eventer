@@ -60,7 +60,7 @@
                                 <input id="phone_number" type="text" class="form-control" value="{{ old('phone_number') }}"  name="phone_number" required autocomplete="tel">
                             </div>
                         </div>
-
+                        <hr>
                         <div class="form-group row">
                             <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Geslo') }}*</label>
 
@@ -82,6 +82,7 @@
                                 <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
                             </div>
                         </div>
+                        <hr>
 
                         <div class="form-group row">
                             <label for="street" class="col-md-4 col-form-label text-md-right">{{ __('Naslov') }}*</label>
@@ -114,11 +115,6 @@
                                 <input id="country-code" type="text" class="form-control" value="{{ old('country_code') }}"  name="country_code" required autocomplete="country_code">
                             </div>
                         </div>-->
-
-                        <div class="form-group form-check text-center" >
-                            <input type="checkbox" class="form-check-input" id="agreement" required="required">
-                            <label class="form-check-label" for="agreement">Strinjam se z obdelavo osebnih podatkov in <a href="/pravila-in-pogoji-poslovanja">splošnimi pogoji poslovanja</a>.</label>
-                          </div>
 
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">

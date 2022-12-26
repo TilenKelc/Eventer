@@ -13,6 +13,7 @@ use App\Rent;
 use App\Product;
 use App\Size;
 use App\Reservation;
+use App\Category;
 
 use Log;
 
@@ -75,6 +76,8 @@ class UserController extends Controller
     }
 
     public function getAllUsers(){
+        
+        
         $user = User::where("deleted", false)->where("user_role", "customer")->orderBy('created_at', 'asc')->get();
         return Datatables::of($user)
             ->editColumn('name', function($user){
@@ -112,8 +115,20 @@ class UserController extends Controller
         //$rent = Rent::where('customer_id', Auth::id())->get();
         $rent = Rent::where('customer_id', $request->id)->get();
         return Datatables::of($rent)
-            ->editColumn('id', function($rent){
-                return $rent->id;
+            ->editColumn('category_id', function($rent){
+                $category = "";
+                $equipment_ids = json_decode($rent->equipment_ids);
+                if($equipment_ids == null){
+                    $reservation_ids = json_decode($rent->reservation_ids);
+                    $reservation = Reservation::find($reservation_ids[0]);
+
+                    $product = Product::find($reservation->product_id);
+                    $category = Category::find($product->category_id)->name;
+                }else{
+                    $product = Product::find($equipment_ids[0]);
+                    $category = Category::find($product->category_id)->name;
+                }
+                return $category;
             })
             ->editColumn('equipment_ids', function($rent){
                 $list = '<ul class="list">';
@@ -123,12 +138,12 @@ class UserController extends Controller
                     foreach($reservation_ids as $id){
                         $reservation = Reservation::find($id);
                         $product = Product::find($reservation->product_id);
-                        $list = $list . '<li>' . $product->name . ' (' . $product->product_id . ')</li>';
+                        $list = $list . '<li>' . $product->name .'</li>';
                     }
                 }else{
                     foreach($equipment_ids as $id){
                         $product = Product::find($id);
-                        $list = $list . '<li>' . $product->name . ' (' . $product->product_id . ')</li>';
+                        $list = $list . '<li>' . $product->name . '</li>';
                     }
                 }
                 $list = $list . '</ul>';
@@ -138,10 +153,7 @@ class UserController extends Controller
                 return date('d.m.Y', strtotime($rent->rental_from));
             })
             ->editColumn('rental_to', function($rent){
-                return date('d.m.Y', strtotime($rent->rental_to));
-            })
-            ->editColumn('total_price', function($rent){
-                return $rent->total_price . ' EUR';
+                return date('H:00', strtotime($rent->rental_from)) . ' - ' . date('H:00', strtotime($rent->rental_to));
             })
             ->editColumn('status', function($rent){
                 if($rent->status == 'in_progress'){
@@ -156,27 +168,13 @@ class UserController extends Controller
                     return 'V čakanju';
                 }
             })
-            ->editColumn('contract_filepath', function($rent){
-                if($rent->contract_filepath == null){
-                    return 'Dokument še ni na voljo';
-                }else{
-                    return "<a href='$rent->contract_filepath' target='_blank'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></a>";
-                }
-            })
-            ->editColumn('return_confirmation_filepath', function($rent){
-                if($rent->return_confirmation_filepath == null){
-                    return 'Dokument še ni na voljo';
-                }else{
-                    return "<a href='$rent->return_confirmation_filepath' target='_blank'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></a>";
-                }
-            })
             ->editColumn('created_at', function($rent){
-                return date('d.m.Y h:i', strtotime($rent->created_at));
+                return date('d.m.Y H:00', strtotime($rent->created_at));
             })
             ->addColumn('edit', function ($rent) {
-                return '<a href="/rent/edit/' .$rent->id. '">Pregled izposoje</a>';
+                return '<a href="/rent/edit/' .$rent->id. '">Pregled</a>';
             })
-            ->rawColumns(['equipment_ids', 'contract_filepath', 'return_confirmation_filepath', 'edit'])
+            ->rawColumns(['equipment_ids', 'edit'])
             ->make(true);
 
     }

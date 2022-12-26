@@ -260,52 +260,6 @@
                             });
                         }
                     })
-
-                    /*const date1 = new Date(search_from);
-                    const date2 = new Date(search_to);
-                    let diffTime = Math.abs(date2 - date1);
-                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    diffDays += 1;
-
-                    if(search_from == search_to && is_weekend(search_from)){
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Izberete lahko le soboto in nedeljo hkrati!',
-                        });
-                    }else if(diffDays > '{{ $product->max_num_days }}' || diffDays < '{{ $product->min_num_days }}'){
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Minimalno število dni za ta kos opreme je {{ $product->min_num_days }}, maksimalno pa {{ $product->max_num_days }}!',
-                        });
-                    }else{
-                        Swal.fire({
-                            title: 'Ali ste prepričani?',
-                            text: "Trenutno izbrani datum je od " + moment(search_from).format('DD.MM.Y') + " do " + moment(search_to).format('DD.MM.Y'),
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#26aa01',
-                            cancelButtonColor: '#6a0505',
-                            confirmButtonText: 'Da, ta termin mi ustreza.',
-                            cancelButtonText: 'Ne, prekliči',
-                        }).then((result) => {
-                            if(result.isConfirmed) {
-                                $.ajax({
-                                    url: "{{ url('reservation/add') }}",
-                                    data: {
-                                    product_id: "<?= $product->id ?>",
-                                    start: search_from,
-                                    end: search_to
-                                    },
-                                    type: "POST",
-                                    success: function (response) {
-                                        window.location.replace('{{ url("/product/$product->id") }}');
-                                    }
-                                });
-                            }
-                        })
-                    }*/
                 }
             });
         });

@@ -21,13 +21,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\TestController;
 
 Auth::routes();
-//Auth::routes(['verify' => true]);
-
-/*
-Route::middleware(['auth', 'agent'])->group(function(){
-
-});
-*/
 
 Route::middleware(['auth', 'admin'/*, 'verified'*/])->group(function(){
     // Agents
@@ -43,6 +36,10 @@ Route::middleware(['auth', 'admin'/*, 'verified'*/])->group(function(){
     // Company
     Route::get('/company/edit', [CompanyController::class, 'show']);
     Route::post('/company/save', [CompanyController::class, 'saveUpdatedData']);
+
+    // User
+    Route::get('/user/show/all', [UserController::class, 'showAll']);
+    Route::get('/user/get/all', [UserController::class, 'getAllUsers']);
 });
 
 Route::middleware(['auth', 'staff'/*, 'verified'*/])->group(function(){
@@ -82,10 +79,6 @@ Route::middleware(['auth', 'staff'/*, 'verified'*/])->group(function(){
     Route::post('/product/fetch', [ProductController::class, 'fetch'])->name('product.fetch');
 
     Route::get('/product/delete/{id}', [ProductController::class, 'delete']);
-
-    // User
-    Route::get('/user/show/all', [UserController::class, 'showAll']);
-    Route::get('/user/get/all', [UserController::class, 'getAllUsers']);
 });
 
 Route::middleware(['auth'/*,'verified'*/])->group(function(){

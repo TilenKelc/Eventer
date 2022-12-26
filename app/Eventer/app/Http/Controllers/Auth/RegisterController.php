@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Str;
 
 use App\Address;
 use Log;
@@ -96,6 +97,7 @@ class RegisterController extends Controller
         $user->phone_number = $data['phone_number'];
         $user->password = Hash::make($data['password']);
         $user->address_id = $address_id;
+        $user->api_token = Str::random(60);
         $user->save();
 
         return $user;

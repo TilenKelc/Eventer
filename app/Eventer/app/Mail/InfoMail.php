@@ -30,7 +30,7 @@ class InfoMail extends Mailable
      */
     public function build()
     {
-        return $this->from('')
+        return $this->from('tilen.kelc@gmail.com', 'Obvestilo o novi rezervaciji')
             ->subject('Nova rezervacija')
             ->view('mail.info')
             ->with([

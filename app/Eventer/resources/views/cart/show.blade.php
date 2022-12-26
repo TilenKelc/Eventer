@@ -71,12 +71,8 @@
                     </div>
                 </div>
                 <div class="finish_button_wrap">
-                    @if(Auth::user()->isAgent())
-                        <button class="btn custom-submit-btn"  id="confirmBtn">Potrdi rezervacijo</button>
-                    @else
-                        <button class="btn custom-submit-btn" id="confirmBtn">Nadaljuj na plačilo in potrdi rezervacijo</button>
-                        <center><p>Plačilo rezervacije v višini {{ ceil($category->amount) }}€. Plačilo je možno s karticami Visa, Maestro, Mastercard,...</p></center>
-                    @endif
+                    <button class="btn custom-submit-btn" id="confirmBtn">Nadaljuj na plačilo in potrdi rezervacijo</button>
+                    <center><p>Plačilo rezervacije v višini {{ ceil($category->amount) }}€. </p></center>
                 </div>
             </div>
         @endif
@@ -85,23 +81,7 @@
     <script>
         $(document).ready(function () {
             $('#confirmBtn').on('click', function(){
-                if('{{ Auth::user()->isAgent() }}' == true){
-                    Swal.fire({
-                        title: 'Ali ste prepričani, da želite oddati naročilo?',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#26aa01',
-                        cancelButtonColor: '#6a0505',
-                        confirmButtonText: 'Da',
-                        cancelButtonText: 'Ne, prekliči',
-                    }).then((result) => {
-                        if(result.isConfirmed) {
-                            location.href = '{{ url("/payment/$rent_id") }}';
-                        }
-                    });
-                }else{
-                    location.href = '{{ url("/payment/$rent_id") }}';
-                }
+                location.href = '{{ url("/payment/$rent_id") }}';
             });
         });
     </script>

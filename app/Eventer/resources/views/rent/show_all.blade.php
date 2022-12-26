@@ -6,16 +6,13 @@
     <table id="rentals-table">
         <thead>
             <tr>
-                <th>Številka izposoje</th>
-                <th>Oprema</th>
-                <th>Datum od</th>
-                <th>Datum do</th>
-                <th>Skupna cena</th>
+                <th>Restavracija</th>
+                <th>Mize</th>
+                <th>Datum</th>
+                <th>Termin</th>
                 <th>Status</th>
-                <th>Pogodba o najemu</th>
-                <!--<th>Pogodba o vračilu</th>-->
                 <th>Datum ustvarjanja</th>
-                <th>Pregled izposoje</th>
+                <th>Pregled rezervacije</th>
             </tr>
         </thead>
     </table>
@@ -43,14 +40,11 @@
         orderClasses: false,
         ajax: '{{ url("/user/get_rent/$user_id") }}',
         columns: [
-            { data: 'id' },
+            { data: 'category_id' },
             { data: 'equipment_ids' },
             { data: 'rental_from' },
             { data: 'rental_to' },
-            { data: 'total_price' },
             { data: 'status' },
-            { data: 'contract_filepath' },
-            //{ data: 'return_confirmation_filepath' },
             { data: 'created_at' },
             { data: 'edit', orderable: false }
         ]
