@@ -22,9 +22,7 @@ class ApiController extends Controller
         $credentials = $request->only('email', 'password');
 
         if(!Auth::attempt($credentials)){
-            return response()->json([
-                'message' => 'Invalid login details'
-            ], 401);
+            return response()->json('Invalid login details');
         }
 
         $user = User::where('email', $request['email'])->firstOrFail();
@@ -40,10 +38,10 @@ class ApiController extends Controller
             'surname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
-            'phone_number' => ['required', 'string', 'min:8'],
-            'street' => ['required', 'string'],
-            'city' => ['required', 'string'],
-            'postal_code' => ['required', 'string', 'regex:/([1-9][0-9]{3})/'],
+            'phone_number' => ['required', 'string'],
+            //'street' => ['required', 'string'],
+            //'city' => ['required', 'string'],
+            //'postal_code' => ['required', 'string', 'regex:/([1-9][0-9]{3})/'],
             // 'country_code' => ['required', 'string'],
         ]);
 
@@ -52,7 +50,7 @@ class ApiController extends Controller
             return response()->json([$validator->messages()->get('*')]);
         }
         
-        $address_check = Address::where('street', $request->street)
+        /*$address_check = Address::where('street', $request->street)
             ->where('city', $request->city)
             ->where('postal_code', $request->postal_code)
             ->where('country_code', 'SL')->first();
@@ -69,7 +67,7 @@ class ApiController extends Controller
             $address_id = $address->id;
         }else{
             $address_id = $address_check->id;
-        }
+        }*/
 
         $user = new User();
         $user->name = $request->name;
@@ -77,13 +75,13 @@ class ApiController extends Controller
         $user->email = $request->email;
         $user->phone_number = $request->phone_number;
         $user->password = Hash::make($request->password);
-        $user->address_id = $address_id;
+        //$user->address_id = $address_id;
         $user->api_token = Str::random(60);
         $user->save();
         
-        Log::info("User created");
+        //Log::info("User created");
 
-        return response()->json(["token" => $user->api_token]);
+        return response()->json($user->api_token);
     }
 
     public function getCategoriesApi(Request $request){
@@ -248,9 +246,9 @@ class ApiController extends Controller
             'date' => ['required'],
             'time_from' => ['required'],
             'time_to' => ['required'],
-            'card_num' => ['required', 'regex:/^([1-9][0-9]{3})[-]([0-9]{4})[-]([0-9]{4})[-]([0-9]{4})$/'],
+            'card_num' => ['required', 'regex:/^([0-9]{4})[-]([0-9]{4})[-]([0-9]{4})[-]([0-9]{4})$/'],
             'valid' => ['required', 'regex:/^(0?[1-9]|1[012])[\/]([0-9]{2})$/'],
-            'ccv' => ['required', 'regex:/^([1-9][0-9]{2})$/'],
+            'ccv' => ['required', 'regex:/^([0-9]{3})$/'],
         ]);
 
         if($validator->fails()) {

@@ -22,9 +22,14 @@ class ProductController extends Controller
 
     public function getProducts(){
         //return Datatables::of(Product::query())->make(true);
-        $category_id = Category::where('agent_id', Auth::user()->id)->pluck('id');
+        if(Auth::user()->isAdmin()){
+            $products = Product::where('deleted', false)->orderBy('created_at', 'asc')->get();
+        }else{
+            $category_id = Category::where('agent_id', Auth::user()->id)->pluck('id');
 
-        $products = Product::where('deleted', false)->whereIn('category_id', $category_id)->orderBy('created_at', 'asc')->get();
+            $products = Product::where('deleted', false)->whereIn('category_id', $category_id)->orderBy('created_at', 'asc')->get();
+        }
+        
         return Datatables::of($products)
                 ->editColumn('name', function($products){
                     return $products->name;
@@ -36,10 +41,13 @@ class ProductController extends Controller
                     return date_format(date_create($products->updated_at), "d.m.Y h:i");
                 })
                 ->addColumn('edit', function ($products) {
-                    return '<a href="/product/edit/' .$products->id. '">Posodobi</a>';
+                    $url = url("/product/edit/$products->id");
+                    return "<a href='$url'>Posodobi</a>";
+
                 })
                 ->addColumn('delete', function($products){
-                    return '<a href="/product/delete/'.$products->id.'" onclick="return confirmAction()">Izbriši</a>';
+                    $url = url("/product/delete/$products->id");
+                    return "<a href='$url' onclick='return confirmAction()'>Izbriši</a>";
                 })
                 ->rawColumns(['edit', 'delete'])
                 ->make(true);

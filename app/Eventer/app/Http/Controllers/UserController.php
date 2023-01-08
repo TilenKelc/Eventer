@@ -102,10 +102,8 @@ class UserController extends Controller
                 }
             })
             ->addColumn('edit', function ($user) {
-                if(Auth::user()->isAdmin()){
-                    return '<a href="/user/edit/' .$user->id. '">Posodobi</a>';
-                }
-                return '<a href="javascript:void(0)" class="demo">Posodobi</a>';
+                $url = url("/user/edit/$user->id");
+                return "<a href='$url'>Posodobi</a>";
             })
             ->rawColumns(['edit', 'address_id'])
             ->make(true);

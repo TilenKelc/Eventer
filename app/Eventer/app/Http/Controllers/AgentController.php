@@ -35,7 +35,8 @@ class AgentController extends Controller
                 return date_format(date_create($agent->last_logged_in), "d.m.Y h:i");
             })
             ->addColumn('edit', function ($agent) {
-                return '<a href="/agent/edit/' .$agent->id. '">Posodobi</a>';
+                $url = url("/agent/edit/$agent->id");
+                return "<a href='$url'>Posodobi</a>";
             })
             ->rawColumns(['edit', 'delete'])
             ->make(true);
@@ -51,8 +52,8 @@ class AgentController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'surname' => 'required',
-            'email' => 'required',
-            'password' => 'required',
+           'email' => ['required', 'email', 'max:255', 'unique:users'],
+           'password' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -66,8 +67,9 @@ class AgentController extends Controller
         $agent->surname = $request->surname;
         $agent->email = $request->email;
         $agent->user_role = 'agent';
+        
 
-        $address_check = Address::where('street', $request->street)->where('city', $request->city)
+        /*$address_check = Address::where('street', $request->street)->where('city', $request->city)
             ->where('postal_code', $request->postal_code)->where('country_code', $request->country_code)->first();
 
         $address_id = null;
@@ -82,12 +84,12 @@ class AgentController extends Controller
             $address_id = $address->id;
         }else{
             $address_id = $address_check->id;
-        }
+        }*/
 
         if($request->password){
             $agent->password = Hash::make($request->password);
         }
-        $agent->address_id = $address_id;
+        //$agent->address_id = $address_id;
         $agent->password = Hash::make($request->password);
         $agent->status = true;
 
@@ -299,7 +301,8 @@ class AgentController extends Controller
                     return date('d.m.Y h:i', strtotime($rent->canceled_timestamp));
                 })
                 ->addColumn('edit', function ($rent) {
-                    return '<a href="/rent/edit/' .$rent->id. '">Posodobi</a>';
+                    $url = url("/rent/edit/$rent->id");
+                    return "<a href='$url'>Posodobi</a>";
                 })
                 ->rawColumns(['edit', 'delete', 'products'])
                 ->make(true);

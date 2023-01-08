@@ -43,7 +43,7 @@
           <a href="/" class="logo">
             <!--<img src="{{URL::asset('/image/sidebar_logo.png')}}" alt="sport_11_izposoja_opreme" class="logo_small">
             <img src="{{URL::asset('/image/sidebar_logo_full.png')}}" alt="sport_11_izposoja_opreme" class="logo_big">-->
-            Logo
+            Eventer
           </a>
         </h1>
         <ul class="list-unstyled components mb-5">
@@ -112,8 +112,6 @@
               <i class="fa fa-bars"></i>
               <span class="sr-only">Toggle Menu</span>
             </button>
-
-             <!--<img src="{{URL::asset('/image/sport11-crnlogo.png')}}" alt="sport_11_izposoja_opreme" class="logo_mobile_center">-->
 
             <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fa fa-chevron-down"></i>
@@ -312,7 +310,7 @@
             cancelButtonText: 'Ne, prekliči.',
           }).then((result) => {
             if(result.isConfirmed) {
-              $.get("/reservation/delete", function(data) {
+              $.get("{{ url('/reservation/delete') }}", function(data) {
                 Swal.fire(
                   'Datum ponastavljen!',
                   '',

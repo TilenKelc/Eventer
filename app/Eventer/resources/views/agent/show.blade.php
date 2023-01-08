@@ -63,7 +63,7 @@
             processing: false,
             serverSide: false,
             orderClasses: false,
-            ajax: '/rent/get/{{ $status }}',
+            ajax: '{{ url("/rent/get/$status") }}',
             columns: dataTablesArray,
         });
     </script>

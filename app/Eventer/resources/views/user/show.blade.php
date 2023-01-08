@@ -30,7 +30,7 @@
             processing: false,
             serverSide: false,
             orderClasses: false,
-            ajax: '/user/get/all',
+            ajax: '{{ url("/user/get/all") }}',
             columns: [
                 { data: 'name', name: 'name' },
                 { data: 'email', name: 'email' },

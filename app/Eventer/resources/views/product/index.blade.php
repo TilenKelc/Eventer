@@ -30,7 +30,7 @@
             processing: false,
             serverSide: false,
             orderClasses: false,
-            ajax: '/product/all',
+            ajax: '{{ url("/product/all") }}',
             columns: [
                 { data: 'name', name: 'name' },
                 { data: 'created_at', name: 'created_at' },

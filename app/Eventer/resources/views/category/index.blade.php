@@ -31,7 +31,7 @@
             processing: false,
             serverSide: false,
             orderClasses: false,
-            ajax: '/category/all',
+            ajax: '{{ url("/category/all") }}',
             columns: [
                 { data: 'name', name: 'name' },
                 { data: 'category_image', name: 'category_image', orderable: false},

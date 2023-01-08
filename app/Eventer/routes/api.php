@@ -42,6 +42,12 @@ Route::middleware(['auth:api'])->group(function(){
 
     // id - product id, date (Y-m-d), time_from (exp: 19:00), time_to, card_num (xxxx-xxxx-xxxx-xxxx), valid (MM/YY), ccv (xxx) 
     Route::post('/rent/pay', [ApiController::class, 'payRent']);
+    
+    // all categories
+    Route::get('/categories', [ApiController::class, 'getCategoriesApi']);
+    
+    // all products for specific category
+    Route::get('/category/products/{id}', [ApiController::class, 'getCategoryProductsApi']);
 });
 
 // body (email, password)
@@ -50,10 +56,4 @@ Route::post('/login', [ApiController::class, 'loginApi']);
 //body (name, surname, email, password, phone_number, street,
 // city, postal_code)
 Route::post('/register', [ApiController::class, 'registerApi']);
-
-// all categories
-Route::get('/categories', [ApiController::class, 'getCategoriesApi']);
-
-// all products for specific category
-Route::get('/category/products/{id}', [ApiController::class, 'getCategoryProductsApi']);
 

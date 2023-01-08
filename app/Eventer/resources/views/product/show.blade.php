@@ -31,12 +31,12 @@
                         @if(session()->get("rental_to") != null && session()->get("rental_from"))
                             @if($already_in_cart)
                                 <div class="addto">
-                                    <a href="/cart" type="button" class="btn already_in_cart"><span class="fa fa-calendar-check-o"></span>Zaključi rezervacijo</a>
+                                    <a href="{{ url('cart') }}" type="button" class="btn already_in_cart"><span class="fa fa-calendar-check-o"></span>Zaključi rezervacijo</a>
                                 </div>
 
                             @else
                                 <div class="addto">
-                                    <?php $url = url("/reservation/add/$product->id") ?>
+                                    <?php $url = url("/reservation/add/$product->id"); ?>
                                     <button type="button" class="btn put_in_cart" onclick="location.href='<?= $url ?>'"><span class="fa fa-calendar-plus-o"></span>Dodaj v košarico</button>
                                 </div>
                             @endif

@@ -35,10 +35,12 @@ class CategoryController extends Controller
                     return $category->category_image;
                 })
                 ->addColumn('edit', function ($category) {
-                    return '<a href="/category/edit/' .$category->id. '">Posodobi</a>';
+                    $url = url("/category/edit/$category->id");
+                    return "<a href='$url'>Posodobi</a>";
                 })
                 ->addColumn('delete', function($category){
-                    return '<a href="/category/delete/'.$category->id.'" onclick="return confirmAction()">Izbriši</a>';
+                    $url = url("/category/delete/'.$category->id");
+                    return "<a href='$url' onclick='return confirmAction()'>Izbriši</a>";
                 })
                 ->rawColumns(['edit', 'delete'])
                 ->make(true);

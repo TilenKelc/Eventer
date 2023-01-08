@@ -11,7 +11,6 @@
                     <th>Ime</th>
                     <th>Priimek</th>
                     <th>Email</th>
-                    <th>Naslov</th>
                     <th>Nazadnje prijavljen</th>
                     <th>Datum ustvarjanja</th>
                     <th>Datum posodabljanja</th>
@@ -33,12 +32,11 @@
             processing: false,
             serverSide: false,
             orderClasses: false,
-            ajax: '/agent/all',
+            ajax: '{{ url("/agent/all") }}',
             columns: [
                 { data: 'name', name: 'name' },
                 { data: 'surname', name: 'surname'},
                 { data: 'email', name: 'email' },
-                { data: 'address_id', name: 'address_id' },
                 { data: 'last_logged_in', name: 'last_logged_in'},
                 { data: 'created_at', name: 'created_at' },
                 { data: 'updated_at', name: 'updated_at' },
